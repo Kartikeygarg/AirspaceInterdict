@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
             }
         });
-            img_lock.setOnClickListener(new View.OnClickListener() {
+          /*  img_lock.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                      shoot.setVisibility(View.VISIBLE);
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         }
 
                     }
-                });
+                });*/
 
             btn_setings.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     switch(motionEvent.getAction()) {
                         case MotionEvent.ACTION_DOWN:
                             shoot.setImageResource(R.drawable.shotzoom);;
-                            handel.postDelayed(run, 3000);
+                            handel.postDelayed(run, 1500);
                             return true;
 
                         case MotionEvent.ACTION_UP:
@@ -338,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 Utils.matToBitmap(mat, bm);
                 bmImage.setImageBitmap(bm);
                 long diff = System.currentTimeMillis()- millis;
-                Log.i("DIFF4 ",""+ diff );
+              //  Log.i("DIFF4 ",""+ diff );
 
             }
         });
@@ -357,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
-      /*  @Override
+        @Override
         public boolean onDown(MotionEvent event)
         {
             int xPos = (int)event.getX();
@@ -365,8 +365,25 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             int xPer =( xPos *100) / (bmImage.getWidth() );
             int yPer = (yPos *100 ) / bmImage.getHeight();
             Log.i("TOUCH", "X: "+ xPos+ " Y: "+yPos +" xPER: "+xPer+" yPer: "+yPer);
+            if(!pan)
+            {
+                shoot.setVisibility(View.VISIBLE);
+                img_lock.setVisibility(View.GONE);
+                lock=true;
+                System.arraycopy(ByteBuffer.allocate(4).putInt(xPer).array(),0,ptxy_array,12,4);
+                System.arraycopy(ByteBuffer.allocate(4).putInt(yPer).array(),0,ptxy_array,16,4);
+                System.arraycopy(ByteBuffer.allocate(4).putInt(10).array(),0,ptxy_array,20,4);
+                System.arraycopy(ByteBuffer.allocate(4).putInt(10).array(),0,ptxy_array,24,4);
+
+                try {
+                    out.write(ptxy_array,0,ptxy_array.length);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
             return true;
-        }*/
+        }
 
     /*    @Override
         public boolean onDoubleTap(MotionEvent event) {
@@ -420,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     img_pan.setRotation(img_pan.getRotation() - swipePer);
                     Log.i("Swipe Left : ", "" + swipePer);
 
-                    return false; // Right to left
+                    // Right to left
                 } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                     diffX *= -1;
                     swipePer = (diffX * 100) / (bmImage.getWidth());
@@ -430,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     img_pan.setPivotY(img_pan.getHeight() / 2);
                     img_pan.setRotation(img_pan.getRotation() + swipePer);
                     Log.i("Swipe Right : ", "" + swipePer);
-                    return false; // Left to right
+                    // Left to right
                 }
 
 
@@ -439,27 +456,31 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 System.arraycopy(toByteArray("GoUp"), 0, move_array, 12, 4);
                 System.arraycopy(ByteBuffer.allocate(4).putInt(swipePer).array(), 0, move_array, 16, 4);
                 Log.i("Swipe UP : ", "" + swipePer);
-                return false; // Bottom to top
+               // Bottom to top
             } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                 diffY *= -1;
                 swipePer = (diffY * 100) / bmImage.getHeight();
                 System.arraycopy(toByteArray("Down"), 0, move_array, 12, 4);
                 System.arraycopy(ByteBuffer.allocate(4).putInt(swipePer).array(), 0, move_array, 16, 4);
                 Log.i("Swipe Down : ", "" + swipePer);
-                return false; // Top to bottom
+                // Top to bottom
             }
+
+                Log.i("OUT.write","Value of swipe : "+swipePer);
 
             if (swipePer > 0) {
                 try {
 
                     out.write(move_array, 0, move_array.length);
+                    Log.i("OUT.write","Writing PAN cmd of length "+move_array.length);
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
+                return false;
         }
-            else if(!lock)
+            /*else if(!lock)
             {
 
                touchedRect = new Rect();
@@ -492,7 +513,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 img_lock.setVisibility(View.VISIBLE);
 
               //  shoot.setVisibility(View.VISIBLE);
-            }
+            }*/
             return false;
         }
     }
@@ -539,7 +560,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     long mill = System.currentTimeMillis();
                     IOUtils.read(in, input);
                     draw(input);
-                    Log.i("DIFF Frame"+i, ""+(System.currentTimeMillis()-mill));
+                 //   Log.i("DIFF Frame"+i, ""+(System.currentTimeMillis()-mill));
 
                 }
                 response = "";
